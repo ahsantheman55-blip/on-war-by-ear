@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>On War by Ear — Scholarly Lectures</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 800px; margin: 2rem auto; padding: 1rem; line-height: 1.6; background: #f8f4e8; color: #222; }
+    h1 { font-variant: small-caps; }
+    button, select { font-size: 1.1rem; margin: 0.5rem; padding: 0.5rem 1rem; }
+    .controls { background: #eee; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+    label { display: block; margin-top: 0.5rem; }
+    audio { width: 100%; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+  <h1>On War by Ear</h1>
+  <p>Lectures in the style of an educated military scholar of Edward Gibbon’s age, with foresight of modern conflicts. For study.</p>
+
+  <div class="controls">
+    <label>Chapter / Lecture:</label>
+    <select id="chapterSelect">
+      <option value="what-is-war">Book I, Chapter 1: What is War?</option>
+      <option value="friction">On Friction in War</option>
+      <option value="modern">Modern Reflections: The Trinity and Our Time</option>
+    </select>
+    <button id="playBtn">Play / Pause</button>
+    <button id="shuffleBtn">Shuffle Best Chapters</button>
+  </div>
+
+  <div class="controls">
+    <label>Speech volume: <input type="range" id="speechVol" min="0" max="1" step="0.1" value="1"></label>
+    <label>Ambient volume: <input type="range" id="ambientVol" min="0" max="1" step="0.1" value="0.3"></label>
+    <label>Ambient track (CC recommended):
+      <select id="ambientSelect">
+        <option value="none">None</option>
+        <option value="march">Marching / Parade</option>
+        <option value="battle">Musket & Cannon</option>
+        <option value="horses">Horses & Cavalry</option>
+      </select>
+    </label>
+    <p><small>Suggested free sources: Freesound.org (search “Napoleonic”, “musket”, “cannon”, “marching”, filter CC0 or CC-BY). Load your own files locally or host them.</small></p>
+  </div>
+
+  <audio id="speechAudio" controls></audio>
+  <audio id="ambientAudio" loop></audio>
+
+  <section id="transcript">
+    <h2>Transcript (Gibbon-style rendering)</h2>
+    <div id="textContent">
+      <p>Select a chapter to begin. Full re-translations of key books will be added progressively. The complete Graham text remains freely available via Project Gutenberg (ebook 1946).</p>
+    </div>
+  </section>
+
+  <script>
+    const speech = document.getElementById('speechAudio');
+    const ambient = document.getElementById('ambientAudio');
+    const speechVol = document.getElementById('speechVol');
+    const ambientVol = document.getElementById('ambientVol');
+    const chapterSelect = document.getElementById('chapterSelect');
+    const ambientSelect = document.getElementById('ambientSelect');
+
+    speechVol.oninput = () => speech.volume = speechVol.value;
+    ambientVol.oninput = () => ambient.volume = ambientVol.value;
+
+    // Placeholder sources — replace with hosted MP3s
+    const chapters = {
+      'what-is-war': { src: 'audio/what-is-war.mp3', text: 'We propose to consider first the single elements of our subject... War therefore is an act of violence intended to compel our opponent to fulfil our will.' },
+      'friction': { src: 'audio/friction.mp3', text: 'Everything is very simple in war, but the simplest thing is difficult. These difficulties accumulate and produce a friction...' },
+      'modern': { src: 'audio/modern.mp3', text: 'A scholar of Gibbon’s age, having lost his notes yet gifted with foresight, would counsel that the trinity of violence, chance, and reason still governs. In our time the weapon must not become the sole force...' }
+    };
+
+    function loadChapter(key) {
+      const ch = chapters[key];
+      speech.src = ch.src;
+      document.getElementById('textContent').innerHTML = '<p>' + ch.text + '</p>';
+    }
+
+    chapterSelect.onchange = () => loadChapter(chapterSelect.value);
+    document.getElementById('playBtn').onclick = () => speech.paused ? speech.play() : speech.pause();
+    document.getElementById('shuffleBtn').onclick = () => {
+      const keys = Object.keys(chapters);
+      loadChapter(keys[Math.floor(Math.random() * keys.length)]);
+      speech.play();
+    };
+
+    ambientSelect.onchange = () => {
+      if (ambientSelect.value === 'none') { ambient.pause(); ambient.src = ''; }
+      else { ambient.src = 'audio/ambient-' + ambientSelect.value + '.mp3'; ambient.play(); }
+    };
+
+    loadChapter('what-is-war');
+  </script>
+</body>
+</html>
